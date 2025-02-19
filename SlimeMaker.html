@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kausar's Magical Slime Maker 🎨</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        background: linear-gradient(135deg, #f6d5f7, #fbe9d7);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Add decorative background patterns */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+          linear-gradient(90deg, transparent 95%, rgba(255, 255, 255, 0.8) 95%),
+          linear-gradient(0deg, transparent 95%, rgba(255, 255, 255, 0.8) 95%);
+        background-size: 30px 30px;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(circle at 10% 20%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 90% 80%, rgba(135, 206, 235, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 50% 50%, rgba(152, 251, 152, 0.2) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .container {
+        max-width: 1200px;
+        width: 100%;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 30px;
+        padding: 30px;
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.95) inset,
+          0 5px 15px rgba(0, 0, 0, 0.05) inset;
+        backdrop-filter: blur(5px);
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 30px;
+        align-items: start;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          grid-template-columns: 1fr;
+          padding: 20px;
+        }
+
+        .checklist-container {
+          order: -1;
+          /* Moves checklist to the top on mobile */
+          margin-bottom: 20px;
+        }
+
+        .main-content {
+          padding: 0;
+        }
+      }
+
+      .container::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        background:
+          linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.5) 49%, rgba(255, 255, 255, 0.5) 51%, transparent 52%) 0 0 / 20px 20px,
+          linear-gradient(-45deg, transparent 48%, rgba(255, 255, 255, 0.5) 49%, rgba(255, 255, 255, 0.5) 51%, transparent 52%) 0 0 / 20px 20px;
+        border-radius: 35px;
+        z-index: -1;
+      }
+
+      .decorative-corner {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        pointer-events: none;
+      }
+
+      .decorative-corner:nth-child(1) {
+        top: -10px;
+        left: -10px;
+        background: radial-gradient(circle at 100% 100%, transparent 30%, rgba(255, 182, 193, 0.3) 31%);
+      }
+
+      .decorative-corner:nth-child(2) {
+        top: -10px;
+        right: -10px;
+        background: radial-gradient(circle at 0% 100%, transparent 30%, rgba(135, 206, 235, 0.3) 31%);
+      }
+
+      .decorative-corner:nth-child(3) {
+        bottom: -10px;
+        left: -10px;
+        background: radial-gradient(circle at 100% 0%, transparent 30%, rgba(152, 251, 152, 0.3) 31%);
+      }
+
+      .decorative-corner:nth-child(4) {
+        bottom: -10px;
+        right: -10px;
+        background: radial-gradient(circle at 0% 0%, transparent 30%, rgba(221, 160, 221, 0.3) 31%);
+      }
+
+      h1 {
+        color: #ff6b6b;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .section-title {
+        color: #666;
+        margin: 20px 0 10px;
+      }
+
+      .color-palette,
+      .decorations {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .color-option {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        margin: auto;
+      }
+
+      .decoration-option {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        margin: auto;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8em;
+        gap: 5px;
+      }
+
+      .decoration-option img {
+        width: 40px;
+        height: 40px;
+      }
+
+      .color-option:hover,
+      .decoration-option:hover {
+        transform: scale(1.1);
+      }
+
+      .color-option.selected,
+      .decoration-option.selected {
+        border: 4px solid #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      }
+
+      #mix-button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.2em;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        margin-bottom: 30px;
+      }
+
+      #mix-button:hover {
+        transform: scale(1.05);
+        background: #45a049;
+      }
+
+      #slime-container {
+        width: 300px;
+        height: 300px;
+        position: relative;
+        margin: auto;
+      }
+
+      .slime {
+        width: 100%;
+        height: 100%;
+        border-radius: 40% 40% 50% 50%;
+        position: absolute;
+        transition: all 0.5s ease;
+        filter: url('#goo');
+        animation: wobble 3s ease-in-out infinite;
+        background-blend-mode: overlay;
+        box-shadow:
+          inset 0 -20px 30px -10px rgba(0, 0, 0, 0.3),
+          inset 0 20px 30px -10px rgba(255, 255, 255, 0.4),
+          0 0 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .slime::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 20%,
+            rgba(255, 255, 255, 0.4) 0%,
+            rgba(255, 255, 255, 0.2) 20%,
+            transparent 60%);
+        border-radius: inherit;
+        pointer-events: none;
+      }
+
+      .slime::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(circle at 70% 80%,
+            rgba(255, 255, 255, 0.2) 0%,
+            transparent 50%),
+          radial-gradient(circle at 20% 70%,
+            rgba(0, 0, 0, 0.1) 0%,
+            transparent 40%);
+        border-radius: inherit;
+        pointer-events: none;
+      }
+
+      .slime-decoration {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .sprinkles {
+        background-image: radial-gradient(circle, #ff69b4 2px, transparent 2px),
+          radial-gradient(circle, #87ceeb 2px, transparent 2px),
+          radial-gradient(circle, #98fb98 2px, transparent 2px);
+        background-size: 30px 30px;
+        background-position: 0 0, 10px 10px, 20px 20px;
+      }
+
+      .glitter {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 2"><path d="M1,0L2,1L1,2L0,1Z" fill="white"/></svg>');
+        background-size: 10px 10px;
+        opacity: 0.5;
+        animation: sparkle 2s linear infinite;
+      }
+
+      .bubbles {
+        background-image: radial-gradient(circle, rgba(255, 255, 255, 0.8) 20%, transparent 20%);
+        background-size: 20px 20px;
+        opacity: 0.6;
+      }
+
+      @keyframes sparkle {
+        0% {
+          opacity: 0.3;
+        }
+
+        50% {
+          opacity: 0.6;
+        }
+
+        100% {
+          opacity: 0.3;
+        }
+      }
+
+      @keyframes wobble {
+
+        0%,
+        100% {
+          transform: scale(1) translateY(0) rotate(0deg);
+          border-radius: 40% 40% 50% 50%;
+        }
+
+        33% {
+          transform: scale(1.05) translateY(-10px) rotate(2deg);
+          border-radius: 45% 35% 48% 52%;
+        }
+
+        66% {
+          transform: scale(1.02) translateY(-5px) rotate(-2deg);
+          border-radius: 35% 45% 52% 48%;
+        }
+      }
+
+      .instructions {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 15px;
+        margin-top: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .mixing-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .mixing-container.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .mixing-animation {
+        width: 200px;
+        height: 200px;
+        position: relative;
+      }
+
+      .color-drop {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        animation: dropAndSpin 1.5s ease-in-out forwards;
+        left: 50%;
+        transform-origin: center;
+      }
+
+      .mixing-bowl {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 160px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 0 0 80px 80px;
+        border: 4px solid rgba(255, 255, 255, 0.4);
+        border-top: none;
+        overflow: hidden;
+      }
+
+      .mixing-bowl::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 0%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2));
+        animation: fillBowl 1.5s ease-in-out forwards;
+      }
+
+      @keyframes dropAndSpin {
+        0% {
+          transform: translate(-50%, -150px) rotate(0deg) scale(1);
+          opacity: 1;
+        }
+
+        60% {
+          transform: translate(calc(-50% + var(--offsetX)), 40px) rotate(180deg) scale(1);
+          opacity: 1;
+        }
+
+        100% {
+          transform: translate(calc(-50% + var(--offsetX)), 40px) rotate(360deg) scale(0);
+          opacity: 0;
+        }
+      }
+
+      @keyframes fillBowl {
+        0% {
+          height: 0%;
+        }
+
+        100% {
+          height: 100%;
+        }
+      }
+
+      @keyframes magicPoof {
+        0% {
+          transform: scale(0.3) rotate(0deg);
+          opacity: 1;
+        }
+
+        50% {
+          transform: scale(1.2) rotate(180deg);
+          opacity: 0.8;
+        }
+
+        100% {
+          transform: scale(0) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      .magic-poof {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, white 0%, transparent 70%);
+        opacity: 0;
+      }
+
+      .checklist-container {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: left;
+      }
+
+      .checklist {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+      }
+
+      .checklist-item.completed {
+        background: rgba(76, 175, 80, 0.1);
+      }
+
+      .checklist-item .checkbox {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #4CAF50;
+        border-radius: 50%;
+        margin-right: 10px;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .checklist-item.completed .checkbox::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #4CAF50;
+        font-size: 16px;
+        animation: checkmark 0.5s ease-out forwards;
+      }
+
+      @keyframes checkmark {
+        0% {
+          transform: translate(-50%, -50%) scale(0);
+          opacity: 0;
+        }
+
+        50% {
+          transform: translate(-50%, -50%) scale(1.5);
+        }
+
+        100% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .save-button,
+      .new-slime-button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1em;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      .save-button.visible,
+      .new-slime-button.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .save-button {
+        background: #2196F3;
+      }
+
+      .save-button:hover {
+        background: #1976D2;
+      }
+
+      .new-slime-button {
+        background: #9C27B0;
+      }
+
+      .new-slime-button:hover {
+        background: #7B1FA2;
+      }
+
+      .main-content {
+        text-align: center;
+      }
+
+      .completion-message {
+        color: #4CAF50;
+        font-size: 1.2em;
+        margin-top: 20px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+      }
+
+      .completion-message.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="main-content">
+        <div class="decorative-corner"></div>
+        <div class="decorative-corner"></div>
+        <div class="decorative-corner"></div>
+        <div class="decorative-corner"></div>
+        <h1>Kausar's Slime Maker 🎨</h1>
+
+        <h3 class="section-title">Choose Your Colors:</h3>
+        <div class="color-palette">
+          <div class="color-option" style="background-color: #FF69B4" data-color="#FF69B4"></div>
+          <div class="color-option" style="background-color: #87CEEB" data-color="#87CEEB"></div>
+          <div class="color-option" style="background-color: #98FB98" data-color="#98FB98"></div>
+          <div class="color-option" style="background-color: #DDA0DD" data-color="#DDA0DD"></div>
+          <div class="color-option" style="background-color: #FFD700" data-color="#FFD700"></div>
+          <div class="color-option" style="background-color: #FF6B6B" data-color="#FF6B6B"></div>
+        </div>
+
+        <h3 class="section-title">Add Some Magic:</h3>
+        <div class="decorations">
+          <div class="decoration-option" data-decoration="sprinkles">
+            <span>🌈</span>
+            <span>Sprinkles</span>
+          </div>
+          <div class="decoration-option" data-decoration="glitter">
+            <span>✨</span>
+            <span>Glitter</span>
+          </div>
+          <div class="decoration-option" data-decoration="bubbles">
+            <span>⭕</span>
+            <span>Bubbles</span>
+          </div>
+        </div>
+
+        <button id="mix-button">Mix Your Slime! ✨</button>
+
+        <div id="slime-container"></div>
+
+        <div class="mixing-container">
+          <div class="mixing-animation">
+            <div class="mixing-bowl"></div>
+            <div class="magic-poof"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="checklist-container">
+        <h3>Slime Making Progress</h3>
+        <ul class="checklist">
+          <li class="checklist-item" data-step="colors">
+            <div class="checkbox"></div>
+            <span>Choose Your Colors</span>
+          </li>
+          <li class="checklist-item" data-step="decorations">
+            <div class="checkbox"></div>
+            <span>Add Decorations</span>
+          </li>
+          <li class="checklist-item" data-step="mixing">
+            <div class="checkbox"></div>
+            <span>Mix Your Slime</span>
+          </li>
+          <li class="checklist-item" data-step="complete">
+            <div class="checkbox"></div>
+            <span>Slime Created!</span>
+          </li>
+        </ul>
+        <div class="completion-message">Your slime is ready! 🎉</div>
+        <div class="action-buttons">
+          <button class="save-button" style="display: none">Save Slime 💾</button>
+          <button class="new-slime-button" style="display: none">Make New Slime 🎨</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SVG filter for gooey effect -->
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
+      <defs>
+        <filter id="goo">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  
+                   0 1 0 0 0  
+                   0 0 1 0 0  
+                   0 0 0 20 -8" result="goo" />
+          <feBlend in="SourceGraphic" in2="goo" mode="normal" />
+          <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+        </filter>
+      </defs>
+    </svg>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const colorOptions = document.querySelectorAll('.color-option');
+        const decorationOptions = document.querySelectorAll('.decoration-option');
+        const mixButton = document.getElementById('mix-button');
+        const slimeContainer = document.getElementById('slime-container');
+        const mixingContainer = document.querySelector('.mixing-container');
+        const mixingAnimation = document.querySelector('.mixing-animation');
+        const selectedColors = new Set();
+        const selectedDecorations = new Set();
+        const checklist = document.querySelectorAll('.checklist-item');
+        const saveButton = document.querySelector('.save-button');
+        const newSlimeButton = document.querySelector('.new-slime-button');
+        const completionMessage = document.querySelector('.completion-message');
+
+        function updateChecklist(step) {
+          const item = document.querySelector(`.checklist-item[data-step="${step}"]`);
+          if (item && !item.classList.contains('completed')) {
+            item.classList.add('completed');
+          }
+        }
+
+        function resetChecklist() {
+          checklist.forEach(item => item.classList.remove('completed'));
+          saveButton.style.display = 'none';
+          newSlimeButton.style.display = 'none';
+          completionMessage.classList.remove('visible');
+        }
+
+        function saveSlime() {
+          const slimeData = {
+            colors: Array.from(selectedColors),
+            decorations: Array.from(selectedDecorations)
+          };
+          localStorage.setItem('savedSlime', JSON.stringify(slimeData));
+        }
+
+        function createNewSlime() {
+          selectedColors.clear();
+          selectedDecorations.clear();
+          colorOptions.forEach(option => option.classList.remove('selected'));
+          decorationOptions.forEach(option => option.classList.remove('selected'));
+          slimeContainer.innerHTML = '';
+          resetChecklist();
+        }
+
+        colorOptions.forEach(option => {
+          option.addEventListener('click', () => {
+            if (option.classList.contains('selected')) {
+              option.classList.remove('selected');
+              selectedColors.delete(option.dataset.color);
+            } else if (selectedColors.size < 3) {
+              option.classList.add('selected');
+              selectedColors.add(option.dataset.color);
+            }
+            if (selectedColors.size > 0) {
+              updateChecklist('colors');
+            }
+          });
+        });
+
+        decorationOptions.forEach(option => {
+          option.addEventListener('click', () => {
+            option.classList.toggle('selected');
+            if (option.classList.contains('selected')) {
+              selectedDecorations.add(option.dataset.decoration);
+              updateChecklist('decorations');
+            } else {
+              selectedDecorations.delete(option.dataset.decoration);
+            }
+          });
+        });
+
+        async function playMixingAnimation(colors) {
+          updateChecklist('mixing');
+          mixingContainer.classList.add('active');
+
+          // Create and animate color drops
+          const drops = colors.map((color, index) => {
+            const drop = document.createElement('div');
+            drop.className = 'color-drop';
+            drop.style.backgroundColor = color;
+            // Calculate offset from center based on index and number of drops
+            const totalWidth = (colors.length - 1) * 30; // 30px spacing between drops
+            const startOffset = -totalWidth / 2;
+            const offsetX = startOffset + (index * 30);
+            drop.style.setProperty('--offsetX', `${offsetX}px`);
+            mixingAnimation.appendChild(drop);
+            return drop;
+          });
+
+          // Wait for drops animation
+          await new Promise(resolve => setTimeout(resolve, 1500));
+
+          // Create magic poof effect
+          const poof = mixingAnimation.querySelector('.magic-poof');
+          poof.style.animation = 'magicPoof 0.8s ease-out forwards';
+
+          // Wait for poof animation
+          await new Promise(resolve => setTimeout(resolve, 800));
+
+          // Clean up and hide mixing animation
+          drops.forEach(drop => drop.remove());
+          mixingContainer.classList.remove('active');
+          poof.style.animation = '';
+
+          // Create the slime
+          createSlime(colors);
+
+          // After mixing is complete
+          updateChecklist('complete');
+          completionMessage.classList.add('visible');
+          saveButton.style.display = 'block';
+          newSlimeButton.style.display = 'block';
+          setTimeout(() => {
+            saveButton.classList.add('visible');
+            newSlimeButton.classList.add('visible');
+          }, 100);
+        }
+
+        function createSlime(colors) {
+          slimeContainer.innerHTML = '';
+          const slime = document.createElement('div');
+          slime.className = 'slime';
+
+          let backgroundColor;
+          if (colors.length === 1) {
+            backgroundColor = colors[0];
+            // Add subtle gradient even for single color
+            slime.style.background = `linear-gradient(135deg, 
+              ${colors[0]} 0%,
+              ${adjustColor(colors[0], 20)} 50%,
+              ${adjustColor(colors[0], -20)} 100%)`;
+          } else {
+            backgroundColor = `linear-gradient(45deg, ${colors.join(', ')})`;
+            slime.style.background = backgroundColor;
+          }
+
+          slimeContainer.appendChild(slime);
+
+          // Add decorations with enhanced effects
+          selectedDecorations.forEach(decoration => {
+            const decorationElement = document.createElement('div');
+            decorationElement.className = `slime-decoration ${decoration}`;
+            if (decoration === 'glitter') {
+              decorationElement.style.mixBlendMode = 'overlay';
+            }
+            slime.appendChild(decorationElement);
+          });
+
+          slime.style.animation = 'none';
+          slime.offsetHeight;
+          slime.style.animation = 'wobble 3s ease-in-out infinite';
+        }
+
+        // Helper function to adjust color brightness
+        function adjustColor(color, percent) {
+          const num = parseInt(color.replace('#', ''), 16);
+          const r = (num >> 16) + percent;
+          const g = ((num >> 8) & 0x00FF) + percent;
+          const b = (num & 0x0000FF) + percent;
+          return '#' + (
+            0x1000000 +
+            (r < 255 ? (r < 1 ? 0 : r) : 255) * 0x10000 +
+            (g < 255 ? (g < 1 ? 0 : g) : 255) * 0x100 +
+            (b < 255 ? (b < 1 ? 0 : b) : 255)
+          ).toString(16).slice(1);
+        }
+
+        mixButton.addEventListener('click', () => {
+          if (selectedColors.size === 0) {
+            alert('Please select at least one color! 🎨');
+            return;
+          }
+
+          const colorArray = Array.from(selectedColors);
+          playMixingAnimation(colorArray);
+        });
+
+        saveButton.addEventListener('click', saveSlime);
+        newSlimeButton.addEventListener('click', createNewSlime);
+
+        // Clear localStorage when window is closed
+        window.addEventListener('beforeunload', () => {
+          localStorage.removeItem('savedSlime');
+        });
+      });
+    </script>
+  </body>
+
+</html>
